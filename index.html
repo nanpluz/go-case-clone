@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gocase clone</title>
+    <link rel="stylesheet" href="./styles/reset.css">
+    <link rel="stylesheet" href="./styles/smartphone.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="smartphone-container">
+            <div id="canvas" class="canvas">
+                <div id="user-image" draggable="false" style="background-image: url(./assets/sasuke.jpg);">                
+                    <div class="resizers">
+                        <div class="resizer nw"></div>
+                        <div class="resizer ne"></div>
+                        <div class="resizer se"></div>
+                        <div class="resizer sw"></div>
+                    </div>
+                </div>
+            </div>
+            <img class="camera" src="./assets/smartphone-camera-mockup.png" style="user-select: none;" draggable="false">
+            <img id="smartphone" class="smartphone" src="./assets/smartphone-mockup.jpg" style="user-select: none;" draggable="false">
+        </div>
+    </div>
+    <button onclick="reset();" style="position: absolute; top: 50%; left: calc(50% + 140px); font-size: 18px; font-weight: 600; padding: 10px; cursor: pointer; border-radius: 5px;">Resetar</button>
+
+    <script src="./scripts/main.js"></script>
+</body>
+
+</html
