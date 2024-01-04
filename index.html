@@ -13,22 +13,17 @@
     <div class="container">
         <div class="smartphone-container">
             <div id="canvas" class="canvas">
-                <div id="user-image" draggable="false" style="background-image: url(./assets/sasuke.jpg);">                
-                    <div class="resizers">
-                        <div class="resizer nw"></div>
-                        <div class="resizer ne"></div>
-                        <div class="resizer se"></div>
-                        <div class="resizer sw"></div>
-                    </div>
-                </div>
+                
             </div>
             <img class="camera" src="./assets/smartphone-camera-mockup.png" style="user-select: none;" draggable="false">
             <img id="smartphone" class="smartphone" src="./assets/smartphone-mockup.jpg" style="user-select: none;" draggable="false">
         </div>
     </div>
     <button onclick="reset();" style="position: absolute; top: 50%; left: calc(50% + 140px); font-size: 18px; font-weight: 600; padding: 10px; cursor: pointer; border-radius: 5px;">Resetar</button>
+    <input oninput="addItemOnCanvas(event)" style="position: absolute; top: calc(50% + 40px); left: calc(50% + 140px); font-size: 18px; font-weight: 600; padding: 10px; cursor: pointer; border-radius: 5px;" type="file" name="" id="">
 
     <script src="./scripts/main.js"></script>
+    <script src="https://kit.fontawesome.com/2015357587.js" crossorigin="anonymous"></script>
 </body>
 
 </html

@@ -41,9 +41,23 @@ body {
     position: absolute;
     top: 10px;
     left: 10px;
+
+    user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    pointer-events: none;
 }
 
-#user-image {
+.smartphone {
+    user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    pointer-events: none;
+}
+
+.user-image {
     position: absolute;
     top: 0;
     left: 0;
@@ -57,8 +71,37 @@ body {
     background-position: center;
 }
 
-#user-image:active {
+.user-image:active {
     cursor: grabbing;
+}
+
+.rotator {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rotator__point {
+    width: 15px;
+    height: 15px;
+
+    background-color: black;
+    border-radius: 50%;
+
+    cursor: pointer;
+}
+
+.rotator__bar {
+    all: unset;
+    display: block;
+    width: 1px;
+    height: 15px;
+    background-color: black;
 }
 
 .resizers {
@@ -99,4 +142,12 @@ body {
     bottom: -7.5px;
     left: -7.5px;
     cursor: sw-resize;
+}
+
+.delete {
+    position: absolute;
+    top: 20px;
+    right: 15px;
+    color: black;
+    cursor: pointer;
 }
