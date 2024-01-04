@@ -4,9 +4,13 @@ userTexts = document.getElementsByClassName('user-text');
 items = [];
 Array.from(userImages).forEach(image => items.push(image));
 Array.from(userTexts).forEach(text => items.push(text));
-selectedItem = 0;
-isResizing = false;
-isRotating = false;
+let selectedItem;
+if (!selectedItem) selectedItem = 0;
+let isResizing;
+let isRotating;
+if (!isResizing) isResizing = false;
+if (!isRotating) isRotating = false;
+indexOfNextItem = 0;
 
 function main() {
     addDefaultItemOnCanvas();
@@ -23,6 +27,15 @@ function rereadScript() {
 
     rereadParameters();
 
+    console.log(items);
+    items.forEach((item, i) => {
+        item.addEventListener('mousedown', () => { selectItem(i); });
+    })
+    let deletes = document.getElementsByClassName('delete');
+    Array.from(deletes).forEach((_delete, i) => {
+        _delete.addEventListener('click', deleteItem(i))
+    });
+
     handleDragging();
     handleResizing();
     handleRotating();
@@ -35,9 +48,16 @@ function rereadParameters() {
     items = [];
     Array.from(userImages).forEach(image => items.push(image));
     Array.from(userTexts).forEach(text => items.push(text));
-    selectedItem = 0;
-    isResizing = false;
-    isRotating = false;
+    selectedItem;
+    if (!selectedItem) selectedItem = 0;
+    if (!isResizing) isResizing = false;
+    if (!isRotating) isRotating = false;
+}
+
+function deleteItem(i) {
+    console.log(i);
+    console.log(items);
+    items[i].remove();
 }
 
 function reset() {
@@ -59,27 +79,27 @@ function handleDragging() {
     }
 
     rereadParameters();
-    items.forEach(item=>item.addEventListener('mousedown', ($event) => { mousedown($event) }));
+    items.forEach(item => item.addEventListener('mousedown', ($event) => { mousedown($event) }));
     window.addEventListener('mouseup', () => { window.removeEventListener('mousemove', mousemove) });
 
     function mousedown($event) {
         rereadParameters();
-        if (!isResizing && !isRotating) {
-            track.startX = $event.clientX;
-            track.startY = $event.clientY;
+        track.startX = $event.clientX;
+        track.startY = $event.clientY;
 
-            window.addEventListener('mousemove', mousemove);
-        }
+        window.addEventListener('mousemove', mousemove);
     }
 
     function mousemove($event) {
-        track.endX = $event.clientX;
-        track.endY = $event.clientY;
+        if (!isResizing && !isRotating) {
+            track.endX = $event.clientX;
+            track.endY = $event.clientY;
 
-        moveUserImage((track.endX - track.startX), (track.endY - track.startY));
+            moveUserImage((track.endX - track.startX), (track.endY - track.startY));
 
-        track.startX = $event.clientX;
-        track.startY = $event.clientY;
+            track.startX = $event.clientX;
+            track.startY = $event.clientY;
+        }
     }
 
     function moveUserImage(x, y) {
@@ -202,17 +222,12 @@ function handleRotating() {
     }
 }
 
-function deleteItem(i) {
-    console.log('a');
-    console.log(items);
-    console.log(i);
-    items[i].remove();
-}
-
 function addItemOnCanvas(e) {
     getBase64(e.target.files[0]).then((file) => {
+        console.log(indexOfNextItem);
+        console.log(items);
         canvas.innerHTML += `
-            <div class="user-image" draggable="false" style="background-image: url(${file});">
+            <div class="user-image" onmousedown="selectItem(${indexOfNextItem})" draggable="false" style="background-image: url(${file});">
                 <div class="rotator">
                     <div class="rotator__point"></div>
                     <hr class="rotator__bar">
@@ -223,18 +238,22 @@ function addItemOnCanvas(e) {
                     <div class="resizer se"></div>
                     <div class="resizer sw"></div>
                 </div>
-                <i onclick="deleteItem(${items.length - 1})" class="delete fa-xmark fa-solid fa-lg"></i>
+                <div onclick="deleteItem(${indexOfNextItem});" class="delete"><i class="fa-xmark fa-solid fa-lg"></i></div>
             </div>
         `
+        selectedItem = indexOfNextItem;
+
+        indexOfNextItem++;
 
         rereadParameters();
-        rereadScript();
     })
 }
 
 function addDefaultItemOnCanvas() {
+    console.log(indexOfNextItem);
+    console.log(items);
     canvas.innerHTML += `
-        <div class="user-image" draggable="false" style="background-image: url(./assets/gumba.jpg);">
+        <div class="user-image" onmousedown="selectItem(${indexOfNextItem})" draggable="false" style="background-image: url(./assets/gumba.jpg);">
             <div class="rotator">
                 <div class="rotator__point"></div>
                 <hr class="rotator__bar">
@@ -245,9 +264,11 @@ function addDefaultItemOnCanvas() {
                 <div class="resizer se"></div>
                 <div class="resizer sw"></div>
             </div>
-            <i onclick="deleteItem(${0})" class="delete fa-xmark fa-solid fa-lg"></i>
+            <div onclick="deleteItem(${indexOfNextItem});" class="delete"><i class="fa-xmark fa-solid fa-lg"></i></div>
         </div>
     `
+    indexOfNextItem++;
+    rereadParameters();
 }
 
 function getBase64(file) {
@@ -263,6 +284,12 @@ function clearEventListeners() {
     var old_canvas_element = document.getElementsByClassName("canvas")[0];
     var new_canvas_element = old_canvas_element.cloneNode(true);
     old_canvas_element.parentNode.replaceChild(new_canvas_element, old_canvas_element);
+}
+
+function selectItem(i) {
+    selectedItem = i;
+    console.log('a')
+    rereadScript();
 }
 
 main();
