@@ -12,28 +12,19 @@ if (!isResizing) isResizing = false;
 if (!isRotating) isRotating = false;
 indexOfNextItem = 0;
 
-function main() {
-    addDefaultItemOnCanvas();
-
-    reset();
-
-    handleDragging();
-    handleResizing();
-    handleRotating();
-}
+function main() { }
 
 function rereadScript() {
     clearEventListeners();
 
     rereadParameters();
-
-    console.log(items);
-    items.forEach((item, i) => {
+    Array.from(items).forEach((item, i) => {
         item.addEventListener('mousedown', () => { selectItem(i); });
-    })
-    let deletes = document.getElementsByClassName('delete');
-    Array.from(deletes).forEach((_delete, i) => {
-        _delete.addEventListener('click', deleteItem(i))
+    });
+    let deleteButtons = document.getElementsByClassName('delete');
+    Array.from(deleteButtons).forEach((deleteButton, i) => {
+        console.log(deleteButton, i);
+        deleteButton.addEventListener('mousedown', ()=>{deleteItem(i)});
     });
 
     handleDragging();
@@ -58,6 +49,7 @@ function deleteItem(i) {
     console.log(i);
     console.log(items);
     items[i].remove();
+    rereadScript();
 }
 
 function reset() {
@@ -179,14 +171,16 @@ function handleResizing() {
 }
 
 function handleRotating() {
-    let rotatorPoint = document.getElementsByClassName('rotator__point')[0];
+    let rotatorPoints = document.getElementsByClassName('rotator__point');
     let track = {
         startX: 0,
         endX: 0,
     }
 
     rereadParameters();
-    rotatorPoint.addEventListener('mousedown', mousedown);
+    Array.from(rotatorPoints).forEach(rotatorPoint => {
+        rotatorPoint.addEventListener('mousedown', mousedown);
+    });
 
     function mousedown(e) {
         rereadParameters();
@@ -223,52 +217,42 @@ function handleRotating() {
 }
 
 function addItemOnCanvas(e) {
-    getBase64(e.target.files[0]).then((file) => {
-        console.log(indexOfNextItem);
-        console.log(items);
-        canvas.innerHTML += `
-            <div class="user-image" onmousedown="selectItem(${indexOfNextItem})" draggable="false" style="background-image: url(${file});">
-                <div class="rotator">
-                    <div class="rotator__point"></div>
-                    <hr class="rotator__bar">
-                </div>     
-                <div class="resizers">
-                    <div class="resizer nw"></div>
-                    <div class="resizer ne"></div>
-                    <div class="resizer se"></div>
-                    <div class="resizer sw"></div>
-                </div>
-                <div onclick="deleteItem(${indexOfNextItem});" class="delete"><i class="fa-xmark fa-solid fa-lg"></i></div>
-            </div>
-        `
-        selectedItem = indexOfNextItem;
-
-        indexOfNextItem++;
-
-        rereadParameters();
-    })
+    $addItemOnCanvas(e)
+        .then(() => {
+            
+        }).catch(err => {
+            throw err;
+        });
 }
 
-function addDefaultItemOnCanvas() {
-    console.log(indexOfNextItem);
-    console.log(items);
-    canvas.innerHTML += `
-        <div class="user-image" onmousedown="selectItem(${indexOfNextItem})" draggable="false" style="background-image: url(./assets/gumba.jpg);">
-            <div class="rotator">
-                <div class="rotator__point"></div>
-                <hr class="rotator__bar">
-            </div>     
-            <div class="resizers">
-                <div class="resizer nw"></div>
-                <div class="resizer ne"></div>
-                <div class="resizer se"></div>
-                <div class="resizer sw"></div>
-            </div>
-            <div onclick="deleteItem(${indexOfNextItem});" class="delete"><i class="fa-xmark fa-solid fa-lg"></i></div>
-        </div>
-    `
-    indexOfNextItem++;
-    rereadParameters();
+function $addItemOnCanvas(e) {
+    return new Promise((resolve, reject) => {
+        getBase64(e.target.files[0]).then((file) => {
+            canvas.innerHTML += `
+                    <div class="user-image" draggable="false" style="background-image: url(${file});">
+                        <div class="rotator">
+                            <div class="rotator__point"></div>
+                            <hr class="rotator__bar">
+                        </div>     
+                        <div class="resizers">
+                            <div class="resizer nw"></div>
+                            <div class="resizer ne"></div>
+                            <div class="resizer se"></div>
+                            <div class="resizer sw"></div>
+                        </div>
+                        <div class="delete"><i class="fa-xmark fa-solid fa-lg"></i></div>
+                    </div>
+                `
+            selectedItem = indexOfNextItem;
+
+            indexOfNextItem++;
+
+            rereadScript();
+
+            resolve();
+        }).catch(err => reject(err));
+
+    })
 }
 
 function getBase64(file) {
@@ -288,7 +272,6 @@ function clearEventListeners() {
 
 function selectItem(i) {
     selectedItem = i;
-    console.log('a')
     rereadScript();
 }
 
