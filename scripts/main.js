@@ -24,7 +24,7 @@ function rereadScript() {
     let deleteButtons = document.getElementsByClassName('delete');
     Array.from(deleteButtons).forEach((deleteButton, i) => {
         console.log(deleteButton, i);
-        deleteButton.addEventListener('mousedown', ()=>{deleteItem(i)});
+        deleteButton.addEventListener('mousedown', () => { deleteItem(i) });
     });
 
     handleDragging();
@@ -218,9 +218,7 @@ function handleRotating() {
 
 function addItemOnCanvas(e) {
     $addItemOnCanvas(e)
-        .then(() => {
-            
-        }).catch(err => {
+        .then().catch(err => {
             throw err;
         });
 }
@@ -249,6 +247,8 @@ function $addItemOnCanvas(e) {
 
             rereadScript();
 
+            getImageInput().value = null;
+
             resolve();
         }).catch(err => reject(err));
 
@@ -273,6 +273,10 @@ function clearEventListeners() {
 function selectItem(i) {
     selectedItem = i;
     rereadScript();
+}
+
+function getImageInput() {
+    return document.getElementsByClassName('image-input')[0];
 }
 
 main();

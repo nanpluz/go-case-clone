@@ -57,11 +57,56 @@ body {
     pointer-events: none;
 }
 
+.image-input {
+    max-width: 0;
+    max-height: 0;
+
+    opacity: 0;
+    pointer-events: none;
+}
+
+.image-input__label {
+    position: absolute;
+    top: calc(50% + 60px);
+    left: calc(50% + 148px);
+    font-size: 18px;
+    font-weight: 600;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.reset-btn {
+    all: unset;
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 148px);
+    font-size: 18px;
+    font-weight: 600;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: transparent;
+}
+
+.menu-btn {
+    font-size: 18px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, .8);
+    color: white;
+    transition: 200ms;
+}
+
+.menu-btn:hover {
+    background-color: rgba(255, 255, 255, .2);
+}
+
 .user-image {
     position: absolute;
     top: 0;
     left: 0;
-    
+
     width: 150px;
     height: 220px;
 
