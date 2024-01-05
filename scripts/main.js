@@ -23,7 +23,6 @@ function rereadScript() {
     });
     let deleteButtons = document.getElementsByClassName('delete');
     Array.from(deleteButtons).forEach((deleteButton, i) => {
-        console.log(deleteButton, i);
         deleteButton.addEventListener('mousedown', () => { deleteItem(i) });
     });
 
@@ -46,8 +45,6 @@ function rereadParameters() {
 }
 
 function deleteItem(i) {
-    console.log(i);
-    console.log(items);
     items[i].remove();
     rereadScript();
 }
@@ -241,13 +238,15 @@ function $addItemOnCanvas(e) {
                         <div class="delete"><i class="fa-xmark fa-solid fa-lg"></i></div>
                     </div>
                 `
-            selectedItem = indexOfNextItem;
+
+            selectItem(indexOfNextItem);
 
             indexOfNextItem++;
 
             rereadScript();
 
             getImageInput().value = null;
+
 
             resolve();
         }).catch(err => reject(err));
@@ -273,10 +272,82 @@ function clearEventListeners() {
 function selectItem(i) {
     selectedItem = i;
     rereadScript();
+    pointSelectedItem();
+    console.log(selectedItem);
 }
 
 function getImageInput() {
     return document.getElementsByClassName('image-input')[0];
+}
+
+function pointSelectedItem() {
+    hideResizersOfOthers();
+    hideRemoversOfOthers();
+    hideRotatorsOfOthers();
+}
+
+function hideRotatorsOfOthers() {
+    let rotators = document.getElementsByClassName('rotator');
+
+    //first reset
+    for (let rotatorBtn of rotators) {
+        rotatorBtn.style.opacity = 1;
+        rotatorBtn.style.pointerEvents = 'all';
+    }
+
+    //then to the work
+    let i = 0;
+    for (let rotatorBtn of rotators) {
+        if (i != selectedItem) {
+            rotatorBtn.style.opacity = 0;
+            rotatorBtn.style.pointerEvents = 'none';
+        }
+        i++;
+    }
+}
+
+function hideRemoversOfOthers() {
+    let deletes = document.getElementsByClassName('delete');
+
+    //first reset
+    for (let deleteBtn of deletes) {
+        deleteBtn.style.opacity = 1;
+        deleteBtn.style.pointerEvents = 'all';
+    }
+
+    //then to the work
+    let i = 0;
+    for (let deleteBtn of deletes) {
+        if (i != selectedItem) {
+            deleteBtn.style.opacity = 0;
+            deleteBtn.style.pointerEvents = 'none';
+        }
+        i++;
+    }
+}
+
+function hideResizersOfOthers() {
+    let resizers = document.getElementsByClassName('resizer');
+
+    //first the reset
+    for (let resizer of resizers) {
+        resizer.style.opacity = 1;
+        resizer.style.pointerEvents = 'all';
+    }
+
+    //then the magic
+    let currentImageIndex = 0;
+    let resizerIndex = 0;
+    for (let resizer of resizers) {
+        if (resizerIndex === 4) { currentImageIndex++; resizerIndex = 0 }
+
+        if (currentImageIndex != selectedItem) {
+            resizer.style.opacity = 0;
+            resizer.style.pointerEvents = 'none';
+        }
+
+        resizerIndex++;
+    }
 }
 
 main();
