@@ -11,8 +11,22 @@ let isRotating;
 if (!isResizing) isResizing = false;
 if (!isRotating) isRotating = false;
 indexOfNextItem = 0;
+currentZIndexes = []
+items.forEach(item => {
+    currentZIndexes.push(0);
+    item.style.zIndex = 0;
+})
 
-function main() { }
+setInterval(()=>{
+    items.forEach((item, i)=>{
+        console.log('índice', i);
+        console.log('zIndex', item.style.zIndex);
+    })
+}, 1500);
+
+function main() {
+    automaticallyResizeTextareas();
+}
 
 function rereadScript() {
     clearEventListeners();
@@ -20,6 +34,7 @@ function rereadScript() {
     rereadParameters();
     Array.from(items).forEach((item, i) => {
         item.addEventListener('mousedown', () => { selectItem(i); });
+        item.style.zIndex = 0;
     });
     let deleteButtons = document.getElementsByClassName('delete');
     Array.from(deleteButtons).forEach((deleteButton, i) => {
@@ -29,6 +44,11 @@ function rereadScript() {
     handleDragging();
     handleResizing();
     handleRotating();
+
+    automaticallyResizeTextareas();
+
+    handleMoveUpwards();
+    handleMoveBackwards();
 }
 
 function rereadParameters() {
@@ -38,10 +58,73 @@ function rereadParameters() {
     items = [];
     Array.from(userImages).forEach(image => items.push(image));
     Array.from(userTexts).forEach(text => items.push(text));
+    items.forEach(item => {
+        if (!item.classList.contains('is-text')) {
+            if (!item.style.width) item.style.width = '150px';
+            if (!item.style.height) item.style.height = '200px';
+        }
+    })
     selectedItem;
     if (!selectedItem) selectedItem = 0;
     if (!isResizing) isResizing = false;
     if (!isRotating) isRotating = false;
+
+    if (!currentZIndexes) {
+        for (item of items) {
+            currentZIndexes.push(0);
+        }
+    } else if (currentZIndexes.length < items.length) {
+        verifyZIndexesLength();
+    }
+}
+
+function verifyZIndexesLength() {
+    if (currentZIndexes.length < items.length) currentZIndexes.push(0);
+    if (currentZIndexes.length < items.length) verifyZIndexesLength();
+}
+
+function handleMoveUpwards() {
+    let moveUpwards = document.getElementsByClassName('move-upward');
+
+    let i = -1;
+    for (let moveUpward of moveUpwards) {
+        moveUpward.addEventListener('mousedown', ()=>{
+            currentZIndexes[i] = ++currentZIndexes[i];
+            items.forEach((item, ii)=>{
+                if(i == ii) {
+                    items[i].style.zIndex = `${currentZIndexes[i]}`;
+                };
+            })
+            if (moveUpward.parentElement.classList.contains('is-text')) moveUpward.parentElement.children[6].innerHTML = currentZIndexes[i];
+            else moveUpward.parentElement.children[4].innerHTML = currentZIndexes[i];
+        });        
+
+        i++;
+    }
+}
+
+function handleMoveBackwards() {
+    let moveBackwards = document.getElementsByClassName('move-backward');
+
+    let i = -1;
+    for (let moveBackward of moveBackwards) {
+        moveBackward.addEventListener('mousedown', mousedown);
+
+        function mousedown() {
+            currentZIndexes[i] = --currentZIndexes[i];
+            console.log(items[i].style.zIndex);
+            items[i].zIndex = `${currentZIndexes[i]}`;
+            console.log(items[i].zIndex);
+            if (moveBackward.parentElement.classList.contains('is-text')) {
+                moveBackward.parentElement.children[6].innerHTML = currentZIndexes[i];
+            }
+            else {
+                moveBackward.parentElement.children[4].innerHTML = currentZIndexes[i]
+            };
+        }
+
+        i++;
+    }
 }
 
 function deleteItem(i) {
@@ -108,7 +191,8 @@ function handleResizing() {
 
     for (let resizer of resizers) {
         rereadParameters();
-        resizer.addEventListener('mousedown', mousedown);
+
+        if (!resizer.parentElement.parentElement.classList.contains('is-text')) resizer.addEventListener('mousedown', mousedown);
 
         function mousedown($event) {
             rereadParameters();
@@ -213,11 +297,42 @@ function handleRotating() {
     }
 }
 
+function addTextOnCanvas() {
+    canvas.innerHTML += `
+        <div class="user-image is-text" style="top: 150px; left: 50px; cursor: grab;"> 
+            <div class="rotator">
+                <div class="rotator__point" style="cursor: pointer;"></div>
+                <hr class="rotator__bar">
+            </div>
+            <div class="resizers" style="opacity: 0; pointer-events: none;">
+                <div class="resizer nw" style="cursor: grab;"></div>
+                <div class="resizer ne" style="cursor: grab;"></div>
+                <div class="resizer se" style="cursor: grab;"></div>
+                <div class="resizer sw" style="cursor: grab;"></div>
+            </div>
+            <div class="delete text-delete"><i class="fa-xmark fa-solid fa-lg"></i></div>
+            <div class="user-image--text" style="pointer-events: none; cursor: grab;" contenteditable="true">Lorem ipsum</div>
+            <div class="text-selection-border" style="cursor: grab;"></div>
+            <div class="move-upward"> <i class="fa-arrow-up fa-solid fa-lg"></i></div>
+            <div class="z-index">0</div>
+            <div class="move-backward"> <i class="fa-arrow-down fa-solid fa-lg"></i></div>
+        </div>
+    `
+    selectItem(indexOfNextItem);
+    indexOfNextItem++;
+    rereadScript();
+}
+
 function addItemOnCanvas(e) {
-    $addItemOnCanvas(e)
-        .then().catch(err => {
-            throw err;
-        });
+    $addItemOnCanvas(e).then().catch(err => { throw err });
+}
+
+function changeFontSize(event) {
+    items[selectedItem].children[3].style.fontSize = `${event.target.value}px`;
+}
+
+function changeFontWeight(event) {
+    items[selectedItem].children[3].style.fontWeight = `${event.target.value}`;
 }
 
 function $addItemOnCanvas(e) {
@@ -236,6 +351,9 @@ function $addItemOnCanvas(e) {
                             <div class="resizer sw"></div>
                         </div>
                         <div class="delete"><i class="fa-xmark fa-solid fa-lg"></i></div>
+                        <div class="move-upward"> <i class="fa-arrow-up fa-solid fa-lg"></i></div>
+                        <div class="z-index">0</div>
+                        <div class="move-backward"> <i class="fa-arrow-down fa-solid fa-lg"></i></div>
                     </div>
                 `
 
@@ -246,7 +364,6 @@ function $addItemOnCanvas(e) {
             rereadScript();
 
             getImageInput().value = null;
-
 
             resolve();
         }).catch(err => reject(err));
@@ -263,6 +380,25 @@ function getBase64(file) {
     });
 }
 
+function editText() {
+    items[selectedItem].children[3].focus();
+
+    window.setTimeout(function () {
+        var sel, range;
+        if (window.getSelection && document.createRange) {
+            range = document.createRange();
+            range.selectNodeContents(items[selectedItem].children[3]);
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (document.body.createTextRange) {
+            range = document.body.createTextRange();
+            range.moveToElementText(items[selectedItem].children[3]);
+            range.select();
+        }
+    }, 1);
+}
+
 function clearEventListeners() {
     var old_canvas_element = document.getElementsByClassName("canvas")[0];
     var new_canvas_element = old_canvas_element.cloneNode(true);
@@ -273,7 +409,6 @@ function selectItem(i) {
     selectedItem = i;
     rereadScript();
     pointSelectedItem();
-    console.log(selectedItem);
 }
 
 function getImageInput() {
@@ -284,6 +419,9 @@ function pointSelectedItem() {
     hideResizersOfOthers();
     hideRemoversOfOthers();
     hideRotatorsOfOthers();
+    hideTextSelectionBorders();
+
+    if (items[selectedItem].classList.contains('is-text')) items[selectedItem].children[4].style.opacity = '1';
 }
 
 function hideRotatorsOfOthers() {
@@ -295,7 +433,7 @@ function hideRotatorsOfOthers() {
         rotatorBtn.style.pointerEvents = 'all';
     }
 
-    //then to the work
+    //then do the work
     let i = 0;
     for (let rotatorBtn of rotators) {
         if (i != selectedItem) {
@@ -315,7 +453,7 @@ function hideRemoversOfOthers() {
         deleteBtn.style.pointerEvents = 'all';
     }
 
-    //then to the work
+    //then do the work
     let i = 0;
     for (let deleteBtn of deletes) {
         if (i != selectedItem) {
@@ -347,6 +485,29 @@ function hideResizersOfOthers() {
         }
 
         resizerIndex++;
+    }
+}
+
+function changeTextColor(e) {
+    items[selectedItem].children[3].style.color = e.target.value;
+}
+
+function hideTextSelectionBorders() {
+    items.forEach((item, i) => {
+        if (items[i].classList.contains('is-text')) items[i].children[4].style.opacity = '0';
+    })
+}
+
+function automaticallyResizeTextareas() {
+    const tx = document.getElementsByTagName("textarea");
+    for (let i = 0; i < tx.length; i++) {
+        tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+        tx[i].addEventListener("input", OnInput, false);
+    }
+
+    function OnInput() {
+        this.style.height = 0;
+        this.style.height = (this.scrollHeight) + "px";
     }
 }
 

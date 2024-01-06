@@ -20,9 +20,14 @@
         </div>
     </div>
 
-    <!-- <div onclick="reset();" class="reset-btn menu-btn">Resetar</div> -->
+    <button onclick="addTextOnCanvas();" class="menu-btn reset-btn">Adicionar texto</button>
+    <button class="menu-btn edit-text-btn" onclick="editText()">Editar texto</button>
     <label class="image-input__label menu-btn" for="image-input">Adicionar imagem</label>
     <input class="image-input" oninput="addItemOnCanvas(event)"  type="file" id="image-input">
+    <label class="menu-btn edit-text-color-btn" for="text-color-input">Mudar cor do texto</label>
+    <input type="color" id="text-color-input" oninput="changeTextColor(event);">
+    <input class="font-size-input" oninput="changeFontSize(event)" type="text" placeholder="tamanho da fonte">
+    <input class="font-weight-input" oninput="changeFontWeight(event)" type="text" placeholder="grossura da fonte">
 
     <script src="./scripts/main.js"></script>
     <script src="https://kit.fontawesome.com/2015357587.js" crossorigin="anonymous"></script>
